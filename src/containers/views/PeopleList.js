@@ -9,7 +9,7 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
-
+import { SearchBar } from 'react-native-elements';
 import { PepperoniLogo, IconButton } from '../../components/Pepperoni';
 import { Title, Description, Bold } from '../../components/Text';
 import { ViewContainer, Centered, FlexRow } from '../../components/Layout';
@@ -22,7 +22,7 @@ export class PeopleView extends React.Component {
     title: 'People',
   };
 
-  state = { data: {} };
+  state = { data: {}, filteredUsers: [], searchedUsername: '' };
 
   keyExtractor = item => item.id;
 
@@ -40,12 +40,38 @@ export class PeopleView extends React.Component {
       .then(data => this.setState({ data }));
   }
 
+  getUserByUsername(username) {
+    this.setState({ searchedUsername: username });
+
+    fetch(`http://0.0.0.0:3888/users/search/${username}`, {
+      method: 'get',
+      headers: {
+        Authorization:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJmb29AYmFyLmNvbSIsInNjb3BlIjoidXNlciIsImlhdCI6MTUwNDg2NDg0OH0.jk2cvlueBJTWuGB0VMjYnbUApoDua_8FrzogDXzz9iY',
+      },
+    })
+      .then(response => response.json())
+      .then(filteredUsers => this.setState({ filteredUsers }));
+  }
+
   render = () => (
     <ViewContainer>
+      <SearchBar
+        round
+        lightTheme
+        onChangeText={username => this.getUserByUsername(username)}
+        placeholder="Search"
+      />
       <Title> People </Title>
       <Centered>
         <FlatList
-          data={this.state.data}
+          data={
+            this.state.searchedUsername.length > 0 ? (
+              this.state.filteredUsers
+            ) : (
+              this.state.data
+            )
+          }
           keyExtractor={this.keyExtractor}
           renderItem={this.renderItem}
           horizontal={true}

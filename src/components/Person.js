@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginLeft: 10,
     fontSize: 18,
-    fontFamily: 'Avenir',
   },
   bottomPart: {
     width: 200,
